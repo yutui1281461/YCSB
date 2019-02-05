@@ -17,6 +17,7 @@
 /**
  * The YCSB binding for <a href=
  * "https://issues.apache.org/jira/browse/HBASE/fixforversion/12333364/">HBase
- * 0.98.X</a>.
+ * 0.98.X</a>. The classes in this package are also used for the HBase 0.94.X
+ * but with different dependencies via the hbase094 binding.
  */
 package com.yahoo.ycsb.db;
