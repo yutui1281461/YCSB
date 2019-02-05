@@ -24,7 +24,7 @@ LICENSE file.
   <parent>
     <groupId>com.yahoo.ycsb</groupId>
     <artifactId>binding-parent</artifactId>
-    <version>0.15.0-SNAPSHOT</version>
+    <version>0.16.0-SNAPSHOT</version>
     <relativePath>../binding-parent</relativePath>
   </parent>
 
@@ -32,18 +32,11 @@ LICENSE file.
   <name>Apache Ignite</name>
   <packaging>jar</packaging>
 
-
-  <profiles>
-    <profile>
-      <id>tests-on-jdk9</id>
-      <activation>
-        <jdk>1.9</jdk>
-      </activation>
-      <properties>
-        <skipJDK9Tests>true</skipJDK9Tests>
-      </properties>
-    </profile>
-  </profiles>
+  <properties>
+    <skipJDK9Tests>true</skipJDK9Tests>
+    <skipJDK10Tests>true</skipJDK10Tests>
+    <skipJDK11Tests>true</skipJDK11Tests>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -103,6 +96,4 @@ LICENSE file.
       <version>2.11.0</version>
     </dependency>
   </dependencies>
-
-
 </project>
