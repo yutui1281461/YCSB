@@ -23,7 +23,7 @@ import java.lang.management.OperatingSystemMXBean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
 /**
  * Utility functions.
@@ -31,6 +31,18 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class Utils {
   private Utils() {
     // not used
+  }
+
+  private static final Random RAND = new Random();
+  private static final ThreadLocal<Random> RNG = new ThreadLocal<Random>();
+
+  public static Random random() {
+    Random ret = RNG.get();
+    if (ret == null) {
+      ret = new Random(RAND.nextLong());
+      RNG.set(ret);
+    }
+    return ret;
   }
 
   /**
@@ -222,7 +234,7 @@ public final class Utils {
    */
   public static <T> T [] shuffleArray(final T[] array) {
     for (int i = array.length -1; i > 0; i--) {
-      final int idx = ThreadLocalRandom.current().nextInt(i + 1);
+      final int idx = RAND.nextInt(i + 1);
       final T temp = array[idx];
       array[idx] = array[i];
       array[i] = temp;

@@ -21,11 +21,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import com.yahoo.ycsb.ByteIterator;
@@ -733,9 +731,9 @@ public class TimeSeriesWorkload extends Workload {
   protected void doTransactionRead(final DB db, Object threadstate) {
     final ThreadState state = (ThreadState) threadstate;
     final String keyname = keys[keychooser.nextValue().intValue()];
-    final Random random = ThreadLocalRandom.current();
+    
     int offsets = state.queryOffsetGenerator.nextValue().intValue();
-    //int offsets = random.nextInt(maxOffsets - 1);
+    //int offsets = Utils.random().nextInt(maxOffsets - 1);
     final long startTimestamp;
     if (offsets > 0) {
       startTimestamp = state.startTimestamp + state.timestampGenerator.getOffset(offsets);
@@ -750,14 +748,14 @@ public class TimeSeriesWorkload extends Workload {
         fields.add(tagKeys[i]);
       } else {
         fields.add(tagKeys[i] + tagPairDelimiter + 
-            tagValues[random.nextInt(tagCardinality[i])]);
+            tagValues[Utils.random().nextInt(tagCardinality[i])]);
       }
     }
     
     if (queryTimeSpan > 0) {
       final long endTimestamp;
       if (queryRandomTimeSpan) {
-        endTimestamp = startTimestamp + (timestampInterval * random.nextInt(queryTimeSpan / timestampInterval));
+        endTimestamp = startTimestamp + (timestampInterval * Utils.random().nextInt(queryTimeSpan / timestampInterval));
       } else {
         endTimestamp = startTimestamp + queryTimeSpan;
       }
@@ -795,13 +793,13 @@ public class TimeSeriesWorkload extends Workload {
   
   protected void doTransactionScan(final DB db, Object threadstate) {
     final ThreadState state = (ThreadState) threadstate;
-    final Random random = ThreadLocalRandom.current();
-    final String keyname = keys[random.nextInt(keys.length)];
+    
+    final String keyname = keys[Utils.random().nextInt(keys.length)];
     
     // choose a random scan length
     int len = scanlength.nextValue().intValue();
     
-    int offsets = random.nextInt(maxOffsets - 1);
+    int offsets = Utils.random().nextInt(maxOffsets - 1);
     final long startTimestamp;
     if (offsets > 0) {
       startTimestamp = state.startTimestamp + state.timestampGenerator.getOffset(offsets);
@@ -816,14 +814,14 @@ public class TimeSeriesWorkload extends Workload {
         fields.add(tagKeys[i]);
       } else {
         fields.add(tagKeys[i] + tagPairDelimiter + 
-            tagValues[random.nextInt(tagCardinality[i])]);
+            tagValues[Utils.random().nextInt(tagCardinality[i])]);
       }
     }
     
     if (queryTimeSpan > 0) {
       final long endTimestamp;
       if (queryRandomTimeSpan) {
-        endTimestamp = startTimestamp + (timestampInterval * random.nextInt(queryTimeSpan / timestampInterval));
+        endTimestamp = startTimestamp + (timestampInterval * Utils.random().nextInt(queryTimeSpan / timestampInterval));
       } else {
         endTimestamp = startTimestamp + queryTimeSpan;
       }
@@ -844,10 +842,10 @@ public class TimeSeriesWorkload extends Workload {
   
   protected void doTransactionDelete(final DB db, Object threadstate) {
     final ThreadState state = (ThreadState) threadstate;
-    final Random random = ThreadLocalRandom.current();
-    final StringBuilder buf = new StringBuilder().append(keys[random.nextInt(keys.length)]);
     
-    int offsets = random.nextInt(maxOffsets - 1);
+    final StringBuilder buf = new StringBuilder().append(keys[Utils.random().nextInt(keys.length)]);
+    
+    int offsets = Utils.random().nextInt(maxOffsets - 1);
     final long startTimestamp;
     if (offsets > 0) {
       startTimestamp = state.startTimestamp + state.timestampGenerator.getOffset(offsets);
@@ -862,14 +860,14 @@ public class TimeSeriesWorkload extends Workload {
            .append(tagKeys[i]);
       } else {
         buf.append(deleteDelimiter).append(tagKeys[i] + tagPairDelimiter + 
-            tagValues[random.nextInt(tagCardinality[i])]);
+            tagValues[Utils.random().nextInt(tagCardinality[i])]);
       }
     }
     
     if (queryTimeSpan > 0) {
       final long endTimestamp;
       if (queryRandomTimeSpan) {
-        endTimestamp = startTimestamp + (timestampInterval * random.nextInt(queryTimeSpan / timestampInterval));
+        endTimestamp = startTimestamp + (timestampInterval * Utils.random().nextInt(queryTimeSpan / timestampInterval));
       } else {
         endTimestamp = startTimestamp + queryTimeSpan;
       }
@@ -1170,8 +1168,8 @@ public class TimeSeriesWorkload extends Workload {
      * @return The next key to write.
      */
     protected String nextDataPoint(final Map<String, ByteIterator> map, final boolean isInsert) {
-      final Random random = ThreadLocalRandom.current();
-      int iterations = sparsity <= 0 ? 1 : random.nextInt((int) ((double) perKeyCardinality * sparsity));
+      int iterations = sparsity <= 0 ? 1 : 
+          Utils.random().nextInt((int) ((double) perKeyCardinality * sparsity));
       if (iterations < 1) {
         iterations = 1;
       }
@@ -1204,7 +1202,7 @@ public class TimeSeriesWorkload extends Workload {
           
           if (!isInsert) {
             final long delta = (timestampGenerator.currentValue() - startTimestamp) / timestampInterval;
-            final int intervals = random.nextInt((int) delta);
+            final int intervals = Utils.random().nextInt((int) delta);
             map.put(timestampKey, new NumericByteIterator(startTimestamp + (intervals * timestampInterval)));
           } else if (delayedSeries > 0) {
             // See if the series falls in a delay bucket and calculate an offset earlier
@@ -1230,16 +1228,18 @@ public class TimeSeriesWorkload extends Workload {
           } else {
             switch (valueType) {
             case INTEGERS:
-              map.put(valueKey, new NumericByteIterator(random.nextInt()));
+              map.put(valueKey, new NumericByteIterator(Utils.random().nextInt()));
               break;
             case FLOATS:
-              map.put(valueKey, new NumericByteIterator(random.nextDouble() * (double) 100000));
+              map.put(valueKey, new NumericByteIterator(
+                  Utils.random().nextDouble() * (double) 100000));
               break;
             case MIXED:
-              if (random.nextBoolean()) {
-                map.put(valueKey, new NumericByteIterator(random.nextInt()));
+              if (Utils.random().nextBoolean()) {
+                map.put(valueKey, new NumericByteIterator(Utils.random().nextInt()));
               } else {
-                map.put(valueKey, new NumericByteIterator(random.nextDouble() * (double) 100000));
+                map.put(valueKey, new NumericByteIterator(
+                    Utils.random().nextDouble() * (double) 100000));
               }
               break;
             default:
@@ -1252,7 +1252,7 @@ public class TimeSeriesWorkload extends Workload {
         boolean tagRollover = false;
         for (int i = tagCardinality.length - 1; i >= 0; --i) {
           if (tagCardinality[i] <= 1) {
-            tagRollover = true; // Only one tag so needs roll over.
+            // nothing to increment here
             continue;
           }
           

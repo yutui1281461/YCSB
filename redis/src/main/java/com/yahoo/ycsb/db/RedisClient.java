@@ -29,18 +29,12 @@ import com.yahoo.ycsb.DB;
 import com.yahoo.ycsb.DBException;
 import com.yahoo.ycsb.Status;
 import com.yahoo.ycsb.StringByteIterator;
-import redis.clients.jedis.BasicCommands;
-import redis.clients.jedis.HostAndPort;
+
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.Protocol;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -54,12 +48,11 @@ import java.util.Vector;
  */
 public class RedisClient extends DB {
 
-  private JedisCommands jedis;
+  private Jedis jedis;
 
   public static final String HOST_PROPERTY = "redis.host";
   public static final String PORT_PROPERTY = "redis.port";
   public static final String PASSWORD_PROPERTY = "redis.password";
-  public static final String CLUSTER_PROPERTY = "redis.cluster";
 
   public static final String INDEX_KEY = "_indices";
 
@@ -75,28 +68,17 @@ public class RedisClient extends DB {
     }
     String host = props.getProperty(HOST_PROPERTY);
 
-    boolean clusterEnabled = Boolean.parseBoolean(props.getProperty(CLUSTER_PROPERTY));
-    if (clusterEnabled) {
-      Set<HostAndPort> jedisClusterNodes = new HashSet<>();
-      jedisClusterNodes.add(new HostAndPort(host, port));
-      jedis = new JedisCluster(jedisClusterNodes);
-    } else {
-      jedis = new Jedis(host, port);
-      ((Jedis) jedis).connect();
-    }
+    jedis = new Jedis(host, port);
+    jedis.connect();
 
     String password = props.getProperty(PASSWORD_PROPERTY);
     if (password != null) {
-      ((BasicCommands) jedis).auth(password);
+      jedis.auth(password);
     }
   }
 
   public void cleanup() throws DBException {
-    try {
-      ((Closeable) jedis).close();
-    } catch (IOException e) {
-      throw new DBException("Closing connection failed.");
-    }
+    jedis.disconnect();
   }
 
   /*

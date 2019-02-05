@@ -20,7 +20,6 @@ package com.yahoo.ycsb;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
@@ -61,7 +60,7 @@ public class BasicDB extends DB {
     if (todelay > 0) {
       long delayNs;
       if (randomizedelay) {
-        delayNs = TimeUnit.MILLISECONDS.toNanos(ThreadLocalRandom.current().nextInt(todelay));
+        delayNs = TimeUnit.MILLISECONDS.toNanos(Utils.random().nextInt(todelay));
         if (delayNs == 0) {
           return;
         }
@@ -378,15 +377,15 @@ public class BasicDB extends DB {
 
     bdb.init();
 
-    HashMap<String, String> fields = new HashMap<String, ByteIterator>();
-    fields.put("A", new StringByteIterator("X"));
-    fields.put("B", new StringByteIterator("Y"));
+    HashMap<String, String> fields = new HashMap<String, String>();
+    fields.put("A", "X");
+    fields.put("B", "Y");
 
     bdb.read("table", "key", null, null);
     bdb.insert("table", "key", fields);
 
-    fields = new HashMap<String, ByteIterator>();
-    fields.put("C", new StringByteIterator("Z"));
+    fields = new HashMap<String, String>();
+    fields.put("C", "Z");
 
     bdb.update("table", "key", fields);
 

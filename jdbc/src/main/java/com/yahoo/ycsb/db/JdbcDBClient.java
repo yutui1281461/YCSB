@@ -421,8 +421,7 @@ public class JdbcDBClient extends DB {
           if (++numRowsInBatch % batchSize == 0) {
             int[] results = insertStatement.executeBatch();
             for (int r : results) {
-              // Acceptable values are 1 and SUCCESS_NO_INFO (-2) from reWriteBatchedInserts=true
-              if (r != 1 && r != -2) { 
+              if (r != 1) {
                 return Status.ERROR;
               }
             }

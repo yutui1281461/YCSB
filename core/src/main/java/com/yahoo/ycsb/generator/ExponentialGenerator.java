@@ -17,7 +17,7 @@
 
 package com.yahoo.ycsb.generator;
 
-import java.util.concurrent.ThreadLocalRandom;
+import com.yahoo.ycsb.Utils;
 
 /**
  * A generator of an exponential distribution. It produces a sequence
@@ -66,7 +66,7 @@ public class ExponentialGenerator extends NumberGenerator {
    */
   @Override
   public Double nextValue() {
-    return -Math.log(ThreadLocalRandom.current().nextDouble()) / gamma;
+    return -Math.log(Utils.random().nextDouble()) / gamma;
   }
 
   @Override

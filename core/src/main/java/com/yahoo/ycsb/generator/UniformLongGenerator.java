@@ -17,7 +17,7 @@
 
 package com.yahoo.ycsb.generator;
 
-import java.util.concurrent.ThreadLocalRandom;
+import com.yahoo.ycsb.Utils;
 
 /**
  * Generates longs randomly uniform from an interval.
@@ -41,7 +41,7 @@ public class UniformLongGenerator extends NumberGenerator {
 
   @Override
   public Long nextValue() {
-    long ret = Math.abs(ThreadLocalRandom.current().nextLong()) % interval  + lb;
+    long ret = Math.abs(Utils.random().nextLong()) % interval  + lb;
     setLastValue(ret);
 
     return ret;
