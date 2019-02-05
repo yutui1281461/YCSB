@@ -30,7 +30,6 @@ import java.util.Properties;
 public class OneMeasurementHistogram extends OneMeasurement {
   public static final String BUCKETS = "histogram.buckets";
   public static final String BUCKETS_DEFAULT = "1000";
-  public static final String VERBOSE_PROPERTY = "measurement.histogram.verbose";
 
   /**
    * Specify the range of latencies to track in the histogram.
@@ -65,11 +64,6 @@ public class OneMeasurementHistogram extends OneMeasurement {
    */
   private double totalsquaredlatency;
 
-  /**
-   * Whether or not to emit the histogram buckets.
-   */
-  private final boolean verbose;
-  
   //keep a windowed version of these stats for printing status
   private long windowoperations;
   private long windowtotallatency;
@@ -80,7 +74,6 @@ public class OneMeasurementHistogram extends OneMeasurement {
   public OneMeasurementHistogram(String name, Properties props) {
     super(name);
     buckets = Integer.parseInt(props.getProperty(BUCKETS, BUCKETS_DEFAULT));
-    verbose = Boolean.valueOf(props.getProperty(VERBOSE_PROPERTY, String.valueOf(false)));
     histogram = new long[buckets];
     histogramoverflow = 0;
     operations = 0;
@@ -143,13 +136,10 @@ public class OneMeasurementHistogram extends OneMeasurement {
 
     exportStatusCounts(exporter);
 
-    if (verbose) {
-      for (int i = 0; i < buckets; i++) {
-        exporter.write(getName(), Integer.toString(i), histogram[i]);
-      }
-      
-      exporter.write(getName(), ">" + buckets, histogramoverflow);
+    for (int i = 0; i < buckets; i++) {
+      exporter.write(getName(), Integer.toString(i), histogram[i]);
     }
+    exporter.write(getName(), ">" + buckets, histogramoverflow);
   }
 
   @Override
