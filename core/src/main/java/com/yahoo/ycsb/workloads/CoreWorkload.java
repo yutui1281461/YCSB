@@ -71,11 +71,6 @@ public class CoreWorkload extends Workload {
    * The default name of the database table to run queries against.
    */
   public static final String TABLENAME_PROPERTY_DEFAULT = "usertable";
-  public static final String READ_IDENTIFIER = "READ";
-  public static final String UPDATE_IDENTIFIER = "UPDATE";
-  public static final String INSERT_IDENTIFIER = "INSERT";
-  public static final String SCAN_IDENTIFIER = "SCAN";
-  public static final String READMODIFYWRITE_IDENTIFIER = "READMODIFYWRITE";
 
   protected String table;
 
@@ -821,23 +816,23 @@ public class CoreWorkload extends Workload {
 
     final DiscreteGenerator operationchooser = new DiscreteGenerator();
     if (readproportion > 0) {
-      operationchooser.addValue(readproportion, READ_IDENTIFIER);
+      operationchooser.addValue(readproportion, "READ");
     }
 
     if (updateproportion > 0) {
-      operationchooser.addValue(updateproportion, UPDATE_IDENTIFIER);
+      operationchooser.addValue(updateproportion, "UPDATE");
     }
 
     if (insertproportion > 0) {
-      operationchooser.addValue(insertproportion, INSERT_IDENTIFIER);
+      operationchooser.addValue(insertproportion, "INSERT");
     }
 
     if (scanproportion > 0) {
-      operationchooser.addValue(scanproportion, SCAN_IDENTIFIER);
+      operationchooser.addValue(scanproportion, "SCAN");
     }
 
     if (readmodifywriteproportion > 0) {
-      operationchooser.addValue(readmodifywriteproportion, READMODIFYWRITE_IDENTIFIER);
+      operationchooser.addValue(readmodifywriteproportion, "READMODIFYWRITE");
     }
     return operationchooser;
   }
